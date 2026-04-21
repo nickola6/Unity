@@ -3,29 +3,27 @@ using System.Collections.Generic;
 
 public class CubeSpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject _prefab;
+    [SerializeField] private Cube _prefab;
     [SerializeField] private int _minCountCubes = 2;
     [SerializeField] private int _maxCountCubes = 6;
 
-    public List<GameObject> SpawnCubes(Vector3 spawnPosition, Cube parentCube, float childSplitChance)
+    public List<Cube> SpawnCubes(Vector3 spawnPosition, Vector3 parentScale, float childSplitChance)
     {
         int count = Random.Range(_minCountCubes, _maxCountCubes + 1);
-        List<GameObject> spawnedCubes = new();
+        List<Cube> spawnedCubes = new();
 
         for (int i = 0; i < count; i++)
         {
-            GameObject newCube = Instantiate(_prefab, spawnPosition, Quaternion.identity);
-            newCube.transform.localScale = parentCube.transform.localScale / 2f;
+            Cube newCube = Instantiate(_prefab, spawnPosition, Quaternion.identity);
 
-            Renderer renderer = newCube.GetComponent<Renderer>();
-            renderer.material.color = Random.ColorHSV();
+            newCube.transform.localScale = parentScale / 2f;
 
-            Cube newCubeComponent = newCube.GetComponent<Cube>();
-
-            if (newCubeComponent != null)
+            if (newCube.TryGetComponent(out Renderer renderer))
             {
-                newCubeComponent.SetSplitChance(childSplitChance);
+                renderer.material.color = Random.ColorHSV();
             }
+
+            newCube.SetSplitChance(childSplitChance);
 
             spawnedCubes.Add(newCube);
         }

@@ -3,24 +3,28 @@ using System.Collections.Generic;
 
 public class Cube : MonoBehaviour
 {
-    [SerializeField] private float _initialSplitChance = 100f;
+    [SerializeField] private float _initSplitChance = 100f;
     [SerializeField] private CubeSpawner _cubeSpawner;
     [SerializeField] private Explosion _explosion;
 
-    private readonly List<GameObject> _createdCubes = new();
+    private readonly List<Cube> _createdCubes = new();
 
-    public IReadOnlyList<GameObject> CreatedCubes => _createdCubes.AsReadOnly();
+    public IReadOnlyList<Cube> CreatedCubes => _createdCubes.AsReadOnly();
 
-    public void OnMouseDown()
+    public void HandleClick()
     {
-        float childSplitChance = _initialSplitChance / 2f;
-        float randomValue = Random.value * _initialSplitChance + 1;
+        float childSplitChance = _initSplitChance / 2f;
 
-        if (randomValue < _initialSplitChance)
+        float randomValue = Random.value * _initSplitChance + 1;
+
+        Vector3 scale = transform.localScale;
+
+        if (randomValue < _initSplitChance)
         {
-            List<GameObject> newCreatedCubes = _cubeSpawner.SpawnCubes(transform.position, this, childSplitChance);
-            _createdCubes.AddRange(newCreatedCubes);
-            _explosion.ApplyExplosion(transform.position, newCreatedCubes);
+            var newCubes = _cubeSpawner.SpawnCubes(transform.position, scale, childSplitChance);
+            _createdCubes.AddRange(newCubes);
+
+            _explosion.ApplyExplosion(transform.position, newCubes);
         }
 
         Destroy(gameObject);
@@ -28,6 +32,6 @@ public class Cube : MonoBehaviour
 
     public void SetSplitChance(float splitChance)
     {
-        _initialSplitChance = splitChance;
+        _initSplitChance = splitChance;
     }
 }

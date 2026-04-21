@@ -6,21 +6,15 @@ public class Explosion : MonoBehaviour
     [SerializeField] private float _force = 5f;
     [SerializeField] private float _radius = 3f;
 
-    public void ApplyExplosion(Vector3 explosionPosition, List<GameObject> targetObjects)
+    public void ApplyExplosion(Vector3 explosionPosition, List<Cube> cubes)
     {
-        for (int i = 0; i < targetObjects.Count; i++)
+        foreach (Cube cube in cubes)
         {
-            GameObject targetObject = targetObjects[i];
-
-            if (targetObject == null)
+            if (cube == null)
                 continue;
 
-            Rigidbody rigidbody = targetObject.GetComponent<Rigidbody>();
-
-            if (rigidbody == null)
-                continue;
-
-            rigidbody.AddExplosionForce(_force, explosionPosition, _radius, 1f, ForceMode.Impulse);
+            if (cube.TryGetComponent(out Rigidbody rigidbody))
+                rigidbody.AddExplosionForce(_force, explosionPosition, _radius, 1f, ForceMode.Impulse);
         }
     }
 }
