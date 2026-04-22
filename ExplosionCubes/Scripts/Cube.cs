@@ -1,37 +1,21 @@
+using System;
 using UnityEngine;
-using System.Collections.Generic;
 
 public class Cube : MonoBehaviour
 {
-    [SerializeField] private float _initSplitChance = 100f;
-    [SerializeField] private CubeSpawner _cubeSpawner;
-    [SerializeField] private Explosion _explosion;
+    [SerializeField] private float _splitChance = 100f;
 
-    private readonly List<Cube> _createdCubes = new();
+    public event Action<Cube> OnClicked;
 
-    public IReadOnlyList<Cube> CreatedCubes => _createdCubes.AsReadOnly();
+    public float SplitChance => _splitChance;
 
-    public void HandleClick()
+    public void SetSplitChance(float value)
     {
-        float childSplitChance = _initSplitChance / 2f;
-
-        float randomValue = Random.value * _initSplitChance + 1;
-
-        Vector3 scale = transform.localScale;
-
-        if (randomValue < _initSplitChance)
-        {
-            var newCubes = _cubeSpawner.SpawnCubes(transform.position, scale, childSplitChance);
-            _createdCubes.AddRange(newCubes);
-
-            _explosion.ApplyExplosion(transform.position, newCubes);
-        }
-
-        Destroy(gameObject);
+        _splitChance = value;
     }
 
-    public void SetSplitChance(float splitChance)
+    public void Click()
     {
-        _initSplitChance = splitChance;
+        OnClicked?.Invoke(this);
     }
 }

@@ -6,7 +6,7 @@ public class Raycaster : MonoBehaviour
     [SerializeField] private Camera _camera;
     [SerializeField] private InputReader _inputReader;
 
-    public event Action<RaycastHit> OnRaycastHit;
+    public event Action<Cube> OnCubeHit;
 
     private void OnEnable()
     {
@@ -23,6 +23,11 @@ public class Raycaster : MonoBehaviour
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
 
         if (Physics.Raycast(ray, out RaycastHit hit))
-            OnRaycastHit?.Invoke(hit);
+        {
+            if (hit.collider.TryGetComponent(out Cube cube))
+            {
+                OnCubeHit?.Invoke(cube);
+            }
+        }
     }
 }
