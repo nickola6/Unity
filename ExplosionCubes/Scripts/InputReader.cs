@@ -7,7 +7,9 @@ public class InputReader : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        const int LeftMouseButtonIndex = 0;
+
+        if (Input.GetMouseButtonDown(LeftMouseButtonIndex))
             OnClick?.Invoke();
     }
 }
