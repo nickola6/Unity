@@ -4,24 +4,29 @@ using UnityEngine;
 
 namespace RainCubes
 {
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(Renderer))]
+
     public class Cube : MonoBehaviour
     {
         private const float MinLifeTime = 2f;
         private const float MaxLifeTime = 5f;
 
+        protected Rigidbody _rigidbody;
         protected Renderer _renderer;
-        protected bool _activated;
+        protected bool _isActive;
 
         public event Action<Cube> LifeEnded;
 
         private void Awake()
         {
+            _rigidbody = GetComponent<Rigidbody>();
             _renderer = GetComponent<Renderer>();
         }
 
         private void OnCollisionEnter(Collision collision)
         {
-            if (_activated)
+            if (_isActive)
                 return;
 
             if (collision.gameObject.TryGetComponent(out Platform _))
@@ -30,7 +35,7 @@ namespace RainCubes
 
         protected virtual void Activate()
         {
-            _activated = true;
+            _isActive = true;
 
             _renderer.material.color = UnityEngine.Random.ColorHSV();
 
@@ -48,12 +53,11 @@ namespace RainCubes
 
         public virtual void ResetState(Color baseColor)
         {
-            _activated = false;
+            _isActive = false;
             _renderer.material.color = baseColor;
 
-            Rigidbody rigidbody = GetComponent<Rigidbody>();
-            rigidbody.velocity = Vector3.zero;
-            rigidbody.angularVelocity = Vector3.zero;
+            _rigidbody.velocity = Vector3.zero;
+            _rigidbody.angularVelocity = Vector3.zero;
         }
     }
 }
