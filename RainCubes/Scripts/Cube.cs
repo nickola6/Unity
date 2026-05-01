@@ -1,6 +1,6 @@
+using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Pool;
 
 namespace RainCubes
 {
@@ -9,21 +9,10 @@ namespace RainCubes
         private const float MinLifeTime = 2f;
         private const float MaxLifeTime = 5f;
 
-        private Renderer _renderer;
-        private ObjectPool<Cube> _pool;
-        private bool _activated;
+        protected Renderer _renderer;
+        protected bool _activated;
 
-        public void ResetState(ObjectPool<Cube> pool, Color baseColor)
-        {
-            _pool = pool;
-            _activated = false;
-
-            _renderer.material.color = baseColor;
-
-            Rigidbody rigidbody = GetComponent<Rigidbody>();
-            rigidbody.velocity = Vector3.zero;
-            rigidbody.angularVelocity = Vector3.zero;
-        }
+        public event Action<Cube> LifeEnded;
 
         private void Awake()
         {
@@ -39,22 +28,32 @@ namespace RainCubes
                 Activate();
         }
 
-        private void Activate()
+        protected virtual void Activate()
         {
             _activated = true;
 
-            _renderer.material.color = Random.ColorHSV();
+            _renderer.material.color = UnityEngine.Random.ColorHSV();
 
-            float lifeTime = Random.Range(MinLifeTime, MaxLifeTime + 1);
+            float lifeTime = UnityEngine.Random.Range(MinLifeTime, MaxLifeTime + 1);
 
-            StartCoroutine(LifeRoutine(lifeTime));
+            StartCoroutine(LiveRoutine(lifeTime));
         }
 
-        private IEnumerator LifeRoutine(float delay)
+        private IEnumerator LiveRoutine(float delay)
         {
             yield return new WaitForSeconds(delay);
 
-            _pool.Release(this);
+            LifeEnded?.Invoke(this);
+        }
+
+        public virtual void ResetState(Color baseColor)
+        {
+            _activated = false;
+            _renderer.material.color = baseColor;
+
+            Rigidbody rigidbody = GetComponent<Rigidbody>();
+            rigidbody.velocity = Vector3.zero;
+            rigidbody.angularVelocity = Vector3.zero;
         }
     }
 }
